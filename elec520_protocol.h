@@ -63,8 +63,6 @@ bool setFloorConnection(uint8_t f_id, bool cs01);
 bool setRoomConnection(uint8_t f_id, uint8_t r_id, bool cs01);
 bool setUltraValue(uint8_t f_id, uint8_t r_id, uint8_t u_id, uint8_t val);
 bool setHallOpen(uint8_t f_id, uint8_t r_id, uint8_t hs_id, bool open01);
-
-// NEW: RSSI setter (non-breaking addition)
 bool setFloorRssi(uint8_t f_id, uint8_t rssi);
 
 void resetModel();
@@ -82,10 +80,10 @@ String nodeTopicFloorConnection(uint8_t f_id);               // f/{f}/cs
 String nodeTopicRoomConnection(uint8_t f_id,uint8_t r_id);   // f/{f}/r/{r}/cs
 String nodeTopicUltra(uint8_t f_id,uint8_t r_id,uint8_t u_id);  // f/{f}/r/{r}/u/{u}
 String nodeTopicHall(uint8_t f_id,uint8_t r_id,uint8_t hs_id);   // f/{f}/r/{r}/h/{h}
-// NEW: floor RSSI
 String nodeTopicFloorRssi(uint8_t f_id);                     // f/{f}/rsi
 
 // -------- Topic builders (Cloud: WITH header) --------
+String cloudTopicFloor(uint8_t f_id);                       //  ELEC520/security/f/{f}
 String cloudTopicSystemState();                              // ELEC520/security/s/st
 String cloudTopicKeypad();                                   // ELEC520/security/s/ke
 String cloudTopicNetwork();                                  // ELEC520/security/n/st
@@ -94,13 +92,15 @@ String cloudTopicFloorConnection(uint8_t f_id);              // ELEC520/security
 String cloudTopicRoomConnection(uint8_t f_id,uint8_t r_id);  // ELEC520/security/f/{f}/r/{r}/cs
 String cloudTopicUltra(uint8_t f_id,uint8_t r_id,uint8_t u_id); // ELEC520/security/f/{f}/r/{r}/u/{u}
 String cloudTopicHall(uint8_t f_id,uint8_t r_id,uint8_t hs_id); // ELEC520/security/f/{f}/r/{r}/h/{h}
-// NEW: floor RSSI
 String cloudTopicFloorRssi(uint8_t f_id);                    // ELEC520/security/f/{f}/rsi
 
 // -------- ESP-NOW per-room compact string --------
 // Format: f/<f_id>/r/<r_id>/cs:<0|1>;u/<u_id>:<0..255>;h/<hs_id>:<0|1>;...
 String buildRoomEspString(uint8_t f_id, uint8_t r_id);
 bool   parseRoomEspString(const String& roomData);
+
+// Floor RSSI ESP-NOW message builder
+String buildFloorRssiEspString(uint8_t f_id);
 
 // -------- MQTT full-system compact string (single message) --------
 // Keeping signatures to avoid breaking callers; simple implementations provided.
@@ -132,5 +132,11 @@ bool extractFloorRssiFromTopicPayload(const char* topic,
 bool extractFloorRssiFromSingle(const String& line,
                                 uint8_t& out_f_id,
                                 uint8_t& out_rssi);
+
+
+// NEW: Build compact MQTT message for one floor
+String buildFloorMqttString(uint8_t f_id);
+
+bool parseSystemMqttString(const String& systemData);
 
 #endif // ELEC520_PROTOCOL_H
